@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="StoryWeave – read unlimited stories.">
+<meta name="theme-color" content="#0f131a">
+<title>StoryWeave – Read Unlimited Stories</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Literata:opsz,wght@7..72,400;7..72,500;7..72,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f131a;
+  --surface:#19202c;
+  --surface-2:#212a39;
+  --sidebar:#0d1118;
+  --line:rgba(255,255,255,.075);
+  --accent:#18a1a1;
+  --accent-hi:#4fd6d6;
+  --text:#e7ecf4;
+  --muted:#8a96a8;
+  --ok:#3fbf8a;
+  --danger:#ff8a8a;
+  --ui:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --read:'Literata',Georgia,'Times New Roman',serif;
+  --read-size:18px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--text);font:400 14px/1.45 var(--ui);-webkit-font-smoothing:antialiased;min-height:100vh}
+body.lock{overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:0}
+button:disabled{cursor:not-allowed;opacity:.4}
+input,select,textarea{font:inherit;color:inherit}
+img{display:block;max-width:100%}
+:focus-visible{outline:2px solid var(--accent-hi);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+svg.ic{width:1em;height:1em;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+svg.ic.fill{fill:currentColor;stroke:none}
+*{scrollbar-width:thin;scrollbar-color:#2c3646 transparent}
+
+/* ---------- Header ---------- */
+.top{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:8px;min-height:60px;padding:0 20px 0 0;background:rgba(15,19,26,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;width:184px;padding-left:18px;flex:none;font-weight:700;font-size:19px;letter-spacing:-.01em;color:#fff}
+.brand svg{width:36px;height:31px;filter:drop-shadow(0 0 7px rgba(60,220,220,.6))}
+.nav{display:flex;gap:2px;height:60px}
+.nav button{position:relative;padding:0 14px;color:#c1cbd9;font-weight:500}
+.nav button:hover{color:#fff}
+.nav button[aria-current=page]{color:var(--accent-hi)}
+.nav button[aria-current=page]::after{content:"";position:absolute;left:12px;right:12px;bottom:0;height:2px;border-radius:2px;background:var(--accent-hi)}
+.grow{flex:1}
+.search{position:relative;width:min(330px,30vw)}
+.search svg{position:absolute;left:13px;top:11px;font-size:16px;color:var(--muted);pointer-events:none}
+.search input{width:100%;height:38px;padding:0 14px 0 38px;border-radius:10px;background:#1a212d;border:1px solid var(--line)}
+.search input::placeholder{color:#7f8b9d}
+.search input:focus{outline:none;border-color:rgba(79,214,214,.55);box-shadow:0 0 0 3px rgba(24,161,161,.18)}
+.actions{position:relative;display:flex;align-items:center;gap:10px;margin-left:6px}
+.icon-btn{position:relative;display:grid;place-items:center;width:38px;height:38px;border-radius:10px;font-size:19px;color:#c1cbd9}
+.icon-btn:hover{background:#1a212d;color:#fff}
+.icon-btn.dot::after{content:"";position:absolute;top:8px;right:9px;width:8px;height:8px;border-radius:50%;background:#ff5a5a;border:2px solid var(--bg);box-sizing:content-box}
+.user{display:flex;align-items:center;gap:8px;padding:0 4px;font-weight:500;font-size:13.5px;color:#d9e0ea}
+.avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:linear-gradient(140deg,#f2b28a,#b95f86);color:#2b1220;font-weight:700;font-size:13px;box-shadow:0 0 0 2px rgba(255,255,255,.16)}
+.user .ic{font-size:14px;color:var(--muted)}
+.pop{position:absolute;top:48px;right:0;width:300px;padding:8px;border-radius:12px;background:var(--surface);border:1px solid var(--line);box-shadow:0 18px 40px rgba(0,0,0,.5)}
+.pop p{padding:9px 10px;border-radius:8px;font-size:13px;color:#cdd6e2}
+.pop p+p{border-top:1px solid var(--line)}
+.pop b{color:#fff;font-weight:600}
+
+/* ---------- Buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 18px;border-radius:9px;font-weight:600;font-size:13.5px;white-space:nowrap;transition:background .15s,border-color .15s}
+.btn.small{height:34px;padding:0 13px;font-size:13px}
+.btn.primary{background:var(--accent);color:#031416}
+.btn.primary:hover{background:#22b8b8}
+.btn.ghost{border:1px solid rgba(255,255,255,.2);background:rgba(10,15,22,.4);color:#f0f4fa}
+.btn.ghost:hover{border-color:rgba(255,255,255,.38);background:rgba(10,15,22,.65)}
+.btn.ghost[aria-pressed=true]{border-color:rgba(79,214,214,.6);color:var(--accent-hi)}
+.btn.teal-line{border:1px solid rgba(79,214,214,.5);color:var(--accent-hi)}
+.btn.teal-line:hover{background:rgba(24,161,161,.14)}
+
+/* ---------- Layout ---------- */
+.app{display:grid;grid-template-columns:184px minmax(0,1fr) 216px;grid-template-areas:"side main rail";align-items:start}
+.side{grid-area:side;position:sticky;top:60px;height:calc(100vh - 60px);display:flex;flex-direction:column;padding:18px 12px;background:var(--sidebar);border-right:1px solid var(--line)}
+.side-nav{display:grid;gap:4px}
+.side-nav button{display:flex;align-items:center;gap:12px;width:100%;height:42px;padding:0 14px;border-radius:9px;border:1px solid transparent;color:#b4bfce;font-weight:500}
+.side-nav button .ic{font-size:18px}
+.side-nav button:hover{background:#151b25;color:#fff}
+.side-nav button[aria-current=page]{background:rgba(24,161,161,.16);border-color:rgba(79,214,214,.22);color:var(--accent-hi)}
+.dev{margin-top:auto}
+.dev-btn{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:12px;color:#5d6a7d}
+.dev-btn:hover{color:#8a96a8;background:#121822}
+.ok-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 11px;border-radius:999px;background:rgba(63,191,138,.14);border:1px solid rgba(63,191,138,.38);color:#7be0b4;font-size:12px;font-weight:600}
+.ok-badge i{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.dev-exit{display:block;margin:6px 0 0 4px;padding:4px 6px;font-size:12px;color:#7e8a9c;text-decoration:underline;text-underline-offset:3px}
+.dev-exit:hover{color:#c1cbd9}
+.main{grid-area:main;min-width:0;padding:20px 20px 60px}
+.main section{scroll-margin-top:76px}
+.main section+section{margin-top:26px}
+.rail{grid-area:rail;position:sticky;top:60px;height:calc(100vh - 60px);padding:20px 16px 20px 0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.rail .panel{display:flex;flex-direction:column;height:100%;padding:16px 8px 8px 14px}
+.rail h2{margin-bottom:10px;font-size:16px;font-weight:700}
+.rel-list{display:grid;gap:2px;overflow-y:auto;padding-right:6px}
+.rel{display:flex;align-items:center;gap:12px;padding:8px 6px;border-radius:10px;text-align:left;min-width:0}
+.rel:hover{background:var(--surface-2)}
+.rel-cover{width:40px;aspect-ratio:2/3;border-radius:5px;overflow:hidden;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+.rel-cover img{width:100%;height:100%;object-fit:cover}
+.rel strong{display:block;font-size:13px;font-weight:600;line-height:1.3}
+.rel small{color:var(--muted);font-size:11.5px}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;display:flex;align-items:center;gap:30px;min-height:214px;padding:22px 48px 38px;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(90deg,rgba(8,13,19,.94) 0%,rgba(8,13,19,.62) 50%,rgba(8,13,19,.18) 100%),var(--art) center/cover no-repeat,#0a1615}
+.hero-cover{width:114px;aspect-ratio:2/3;flex:none;border-radius:6px;overflow:hidden;box-shadow:0 14px 30px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.12)}
+.hero-cover img{width:100%;height:100%;object-fit:cover}
+.hero-copy{min-width:0}
+.kicker{font-size:14px;color:#dbe3ee;margin-bottom:2px}
+.hero h1{font-size:clamp(26px,3.3vw,38px);line-height:1.1;font-weight:700;letter-spacing:-.02em;color:#fff;text-wrap:balance}
+.hero .sub{margin:6px 0 16px;font-size:14px;color:#d0d9e6}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px}
+.dots{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;gap:6px}
+.dots button{width:22px;height:14px;display:grid;place-items:center}
+.dots button::before{content:"";width:16px;height:3px;border-radius:3px;background:rgba(255,255,255,.3)}
+.dots button[aria-current=true]::before{background:var(--accent-hi)}
+
+/* ---------- Section heads ---------- */
+.sec-h{font-size:16px;font-weight:700;letter-spacing:-.005em}
+.sec-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.sec-tools{display:flex;align-items:center;gap:8px}
+.sec-tools .link{padding:5px 10px;border-radius:8px;font-size:12.5px;color:var(--accent-hi);border:1px solid rgba(79,214,214,.3)}
+.sec-tools .link:hover{background:rgba(24,161,161,.12)}
+.arrow{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--surface);border:1px solid var(--line);font-size:15px;color:#c1cbd9}
+.arrow:hover{background:var(--surface-2);color:#fff}
+#continue .sec-h,#genres .sec-h{margin-bottom:12px}
+
+/* ---------- Continue reading ---------- */
+.cont-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cont{display:flex;align-items:center;gap:12px;padding:10px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.cont:hover{border-color:rgba(79,214,214,.35)}
+.cont-cover{width:44px;aspect-ratio:2/3;border-radius:5px;overflow:hidden;flex:none;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+.cont-cover img{width:100%;height:100%;object-fit:cover}
+.cont-body{min-width:0;flex:1;display:grid;gap:2px}
+.cont-body strong{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cont-body small{color:var(--muted);font-size:11.5px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.bar{flex:1;height:5px;border-radius:9px;background:rgba(255,255,255,.1);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:9px;background:var(--accent-hi)}
+.bar-row b{font-size:11px;font-weight:500;color:#c3ccd9}
+
+/* ---------- Genres ---------- */
+.genre-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.pill{display:flex;align-items:center;justify-content:center;gap:9px;height:50px;padding:0 10px;border-radius:12px;background:var(--bg-t);border:1px solid var(--bd);color:var(--c);font-weight:500;font-size:14px}
+.pill .ic{font-size:18px}
+.pill:hover{filter:brightness(1.18)}
+.pill[aria-pressed=true]{box-shadow:0 0 0 2px var(--c) inset}
+
+/* ---------- Popular ---------- */
+.track{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(160px,calc((100% - 48px)/5));gap:12px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;padding:2px 0 6px}
+.track::-webkit-scrollbar{display:none}
+.track.wrap{grid-auto-flow:row;grid-auto-columns:auto;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));overflow:visible}
+.card{scroll-snap-align:start;min-width:0;padding:8px 8px 10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;cursor:pointer}
+.card:hover{border-color:rgba(79,214,214,.38)}
+.thumb{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#0b1118}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.card h3{margin:9px 2px 4px;font-size:13.5px;font-weight:600;text-transform:lowercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{display:flex;align-items:center;gap:12px;margin:0 2px 8px;font-size:12px;color:#c6cfdc}
+.meta span{display:inline-flex;align-items:center;gap:5px}
+.meta .rate .ic{color:#f5c542}
+.meta .views{color:var(--muted)}
+.meta .new{padding:1px 8px;border-radius:999px;background:rgba(79,214,214,.14);color:var(--accent-hi);font-weight:600;font-size:11px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:0 2px}
+.tags span{padding:2px 9px;border-radius:999px;background:#252e3d;color:#a9b4c4;font-size:11px}
+.del{position:absolute;top:6px;right:6px;display:flex;align-items:center;gap:4px;min-width:26px;height:26px;padding:0 7px;border-radius:7px;background:rgba(8,12,18,.88);color:#ffb0b0;font-size:11px;font-weight:600;justify-content:center}
+.del .ic{font-size:13px}
+.del.armed{background:#7a2530;color:#fff}
+.saved-mark{position:absolute;top:6px;left:6px;display:grid;place-items:center;width:24px;height:24px;border-radius:7px;background:rgba(8,12,18,.85);color:var(--accent-hi);font-size:13px}
+.saved-mark .ic{fill:currentColor}
+.empty{grid-column:1/-1;padding:28px 20px;border:1px dashed rgba(255,255,255,.14);border-radius:12px;color:var(--muted);text-align:center}
+
+/* ---------- Reader ---------- */
+.reader{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;background:#0b0f15;animation:rd .18s ease-out}
+@keyframes rd{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.r-bar{display:flex;align-items:center;gap:12px;padding:10px 18px;border-bottom:1px solid var(--line);background:#0e131b}
+.r-title{min-width:0;flex:1}
+.r-title strong{display:block;font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-title span{font-size:12.5px;color:var(--muted)}
+.r-bar select{height:34px;max-width:200px;padding:0 10px;border-radius:9px;background:#141a24;border:1px solid var(--line);font-size:13px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#141a24}
+.seg button{display:grid;place-items:center;width:36px;height:34px;color:#8a96a8;font-family:var(--read)}
+.seg button:hover{color:#fff}
+.seg button[aria-pressed=true]{background:rgba(24,161,161,.22);color:var(--accent-hi)}
+.r-progress{height:3px;background:rgba(255,255,255,.06)}
+.r-progress i{display:block;height:100%;width:0;background:var(--accent-hi)}
+.r-scroll{flex:1;overflow-y:auto;overscroll-behavior:contain}
+.r-page{max-width:calc(var(--read-size)*36);margin:0 auto;padding:52px 24px 110px;font:400 var(--read-size)/1.8 var(--read);color:#d3d9e4}
+.r-kicker{font:500 13px var(--ui);color:var(--accent-hi);margin-bottom:8px}
+.r-page h2{font-size:1.55em;line-height:1.25;font-weight:600;letter-spacing:-.01em;color:#fff;margin-bottom:.7em;text-wrap:balance}
+.r-sum{margin-bottom:1.8em;padding-left:16px;border-left:2px solid rgba(79,214,214,.4);font-style:italic;font-size:.94em;color:#98a5b8}
+.r-page p{margin:0 0 1.2em;text-wrap:pretty}
+.r-page .r-kicker,.r-page .r-sum{text-wrap:wrap}
+.r-nav{display:flex;justify-content:space-between;gap:12px;margin-top:3.2em;font-family:var(--ui)}
+
+/* ---------- Modal & toast ---------- */
+.overlay{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:16px;background:rgba(4,7,11,.72);backdrop-filter:blur(4px);overflow-y:auto;animation:fd .15s ease-out}
+@keyframes fd{from{opacity:0}to{opacity:1}}
+.modal{width:min(440px,100%);max-height:92vh;overflow-y:auto;padding:24px;border-radius:16px;background:var(--surface);border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 70px rgba(0,0,0,.6)}
+.modal.wide{width:min(640px,100%)}
+.modal h2{font-size:19px;font-weight:700;letter-spacing:-.01em}
+.modal .lede{margin:4px 0 18px;color:var(--muted)}
+.field{display:grid;gap:6px;margin-bottom:14px}
+.field label{font-size:13px;font-weight:500;color:#cdd6e2}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border-radius:9px;background:#121822;border:1px solid rgba(255,255,255,.12)}
+.field textarea{resize:vertical;min-height:80px;line-height:1.5}
+.field input:focus,.field textarea:focus{outline:none;border-color:rgba(79,214,214,.6);box-shadow:0 0 0 3px rgba(24,161,161,.2)}
+.field [aria-invalid=true]{border-color:rgba(255,138,138,.7)}
+.field .hint{font-size:12px;color:var(--muted)}
+.err{font-size:12.5px;color:var(--danger)}
+.row{display:flex;justify-content:flex-end;gap:10px;margin-top:6px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.author-list{display:grid;gap:6px;margin-top:6px}
+.author-list button{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border-radius:10px;background:#121822;border:1px solid var(--line);text-align:left}
+.author-list button:hover{border-color:rgba(79,214,214,.4)}
+.author-list small{color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:24px;z-index:200;transform:translateX(-50%);max-width:min(92vw,460px);padding:11px 16px;border-radius:11px;background:#111b26;border:1px solid rgba(79,214,214,.35);color:#e7f7f7;font-size:13.5px;box-shadow:0 14px 34px rgba(0,0,0,.5);animation:fd .18s ease-out}
+.toast.bad{border-color:rgba(255,138,138,.5)}
+
+/* ---------- Responsive ---------- */
+@media (max-width:1100px){
+  .app{grid-template-columns:184px minmax(0,1fr);grid-template-areas:"side main" "side rail"}
+  .rail{position:static;height:auto;padding:0 20px 40px}
+  .rail .panel{height:auto}
+  .rel-list{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));overflow:visible}
+  .genre-row{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:980px){
+  .top{flex-wrap:wrap;padding:8px 14px}
+  .brand{width:auto;padding-left:0}
+  .nav{order:5;width:100%;height:42px;overflow-x:auto}
+  .nav button{white-space:nowrap}
+  .search{width:auto;flex:1;min-width:120px}
+  .app{grid-template-columns:minmax(0,1fr);grid-template-areas:"main" "rail" "side"}
+  .side{position:static;height:auto;padding:12px 16px 28px;border-right:0;border-top:1px solid var(--line)}
+  .side-nav{display:none}
+  .main{padding:16px 14px 30px}
+  .rail{padding:0 14px 20px}
+  .user span{display:none}
+  .hero{padding:20px 20px 38px;gap:18px}
+}
+@media (max-width:640px){
+  .cont-row{grid-template-columns:1fr}
+  .hero{flex-direction:column;align-items:flex-start;padding-bottom:40px}
+  .hero-cover{width:92px}
+  .upload-label{display:none}
+  .two{grid-template-columns:1fr}
+  .r-bar{flex-wrap:wrap}
+  .r-title{flex-basis:100%}
+  .r-page{padding:34px 18px 90px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="page">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 40 34" fill="none" stroke="#5fe3e3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12c5-2.6 10-2.2 16 2 6-4.2 11-4.6 16-2v16c-5-2.6-10-2.2-16 2-6-4.2-11-4.6-16-2z"/><path d="M20 14v16"/><path d="M20 3v5M17.5 5.5h5" stroke-width="1.8"/><path d="M31 2v3M29.5 3.5h3" stroke-width="1.6"/><path d="M9 4v3M7.5 5.5h3" stroke-width="1.6"/></svg>
+      <span>StoryWeave</span>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button data-nav="home">Home</button>
+      <button data-nav="genres">Genres</button>
+      <button data-nav="authors">Authors</button>
+      <button data-nav="shelf">My Bookshelf</button>
+      <button data-nav="community">Community</button>
+    </nav>
+    <div class="grow"></div>
+    <div class="search">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <label class="sr" for="q">Search stories, genres, authors</label>
+      <input id="q" type="search" placeholder="Search stories, genres, authors..." autocomplete="off">
+    </div>
+    <div class="actions">
+      <button class="btn teal-line small" id="uploadBtn" data-act="upload" hidden>
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span class="upload-label">Upload Story</span><span class="sr upload-sr">Upload Story</span>
+      </button>
+      <button class="icon-btn dot" id="bellBtn" data-act="bell" aria-label="Notifications" aria-expanded="false">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      </button>
+      <div class="user"><span class="avatar" aria-hidden="true">S</span><span>Sarah L.</span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></div>
+      <div class="pop" id="bellPop" hidden>
+        <p><b>The Shadow Cipher</b> has a new chapter ready for you.</p>
+        <p><b>Eleanor Vance</b> posted an update on The Whispering Woods.</p>
+        <p>You're caught up on everything else.</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="app">
+    <aside class="side">
+      <nav class="side-nav" aria-label="Library"></nav>
+      <div class="dev" id="dev"></div>
+    </aside>
+    <main class="main" id="main">
+      <section id="hero" aria-label="Featured story"></section>
+      <section id="continue" aria-labelledby="continueH"></section>
+      <section id="genres" aria-labelledby="genresH"></section>
+      <section id="popular" aria-labelledby="popularH"></section>
+    </main>
+    <aside class="rail" aria-label="New releases">
+      <div class="panel"><h2>New Releases</h2><div class="rel-list" id="rel"></div></div>
+    </aside>
+  </div>
+</div>
+
+<!-- Reader -->
+<div class="reader" id="reader" role="dialog" aria-modal="true" aria-labelledby="rTitle" hidden>
+  <div class="r-bar">
+    <div class="r-title"><strong id="rTitle"></strong><span id="rAuthor"></span></div>
+    <label class="sr" for="rChapters">Chapter</label>
+    <select id="rChapters"></select>
+    <div class="seg" role="group" aria-label="Text size">
+      <button data-size="0" aria-label="Small text" style="font-size:12px">A</button>
+      <button data-size="1" aria-label="Medium text" style="font-size:15px">A</button>
+      <button data-size="2" aria-label="Large text" style="font-size:18px">A</button>
+      <button data-size="3" aria-label="Extra large text" style="font-size:22px">A</button>
+    </div>
+    <button class="btn ghost small" id="rShelf" data-shelf=""></button>
+    <button class="btn ghost small" data-act="close-reader" id="rClose">Close</button>
+  </div>
+  <div class="r-progress" aria-hidden="true"><i id="rBar"></i></div>
+  <div class="r-scroll" id="rScroll"><article class="r-page" id="rPage"></article></div>
+</div>
+
+<div id="modalRoot"></div>
+<div id="toastRoot" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* =====================================================================
+   Helpers
+   ===================================================================== */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+};
+const reduceMotion = () => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } };
+const fmtViews = n => n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K' : String(n);
+const hash = str => { let h = 2166136261; for (const c of String(str)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+
+const ICONS = {
+  search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+  book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  grid:'<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>',
+  bookmark:'<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  left:'<path d="m15 18-6-6 6-6"/>',
+  right:'<path d="m9 18 6-6-6-6"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/>',
+  compass:'<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+  landmark:'<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>',
+  atom:'<circle cx="12" cy="12" r="1"/><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z"/><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  sparkles:'<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 3v4M17 5h4"/>'
+};
+const ic = (n, cls = '') => `<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ICONS.book}</svg>`;
+
+/* =====================================================================
+   Generated artwork (inline SVG, no external images)
+   Scenes are drawn on a 400x300 canvas with the focal subject in the
+   centre so they crop cleanly to 16:9 thumbnails and 2:3 covers.
+   ===================================================================== */
+const PAL = {
+  forest:   {a:'#0d3535', b:'#040f10', g:'#3ee8b5', c:'#f6dc8a', d:'#020a0a'},
+  glyph:    {a:'#0c2c34', b:'#050e14', g:'#22d3d3', c:'#9ff', d:'#020609'},
+  kingdom:  {a:'#4a2212', b:'#140906', g:'#ff9a3c', c:'#ffd27a', d:'#0a0403'},
+  flask:    {a:'#10282c', b:'#07100f', g:'#2ee6c6', c:'#f5c26b', d:'#030808'},
+  moonring: {a:'#082c33', b:'#040d12', g:'#3ff0e6', c:'#dffffb', d:'#02080a'},
+  hood:     {a:'#141d3a', b:'#05070f', g:'#8fb0ff', c:'#e8eeff', d:'#03050c'},
+  cage:     {a:'#33200a', b:'#0a0603', g:'#ffb648', c:'#f2c46b', d:'#080502'},
+  galaxy:   {a:'#080d2a', b:'#03040d', g:'#b58cff', c:'#6fb7ff', d:'#02030a'},
+  runner:   {a:'#331258', b:'#0a0416', g:'#ff5fa8', c:'#ffc0e0', d:'#07030f'}
+};
+const stars = (r, n, col = '#fff', y0 = 0, y1 = 300) => {
+  let s = '';
+  for (let i = 0; i < n; i++) s += `<circle cx="${(r() * 400).toFixed(1)}" cy="${(y0 + r() * (y1 - y0)).toFixed(1)}" r="${(.4 + r() * 1.1).toFixed(2)}" fill="${col}" opacity="${(.3 + r() * .7).toFixed(2)}"/>`;
+  return s;
+};
+const SCENES = {
+  forest(p, r) {
+    let s = `<ellipse cx="200" cy="175" rx="150" ry="100" fill="url(#glow)" opacity=".75"/><path d="M178 300 L192 130 L208 130 L224 300Z" fill="${p.g}" opacity=".14"/>`;
+    for (let i = 0; i < 14; i++) {
+      const x = i < 7 ? -10 + i * 24 + r() * 10 : 250 + (i - 7) * 24 + r() * 10, w = 8 + r() * 14, top = r() * 40;
+      s += `<path d="M${x.toFixed(1)} 300 L${(x + w * .35).toFixed(1)} ${top.toFixed(1)} L${(x + w * .65).toFixed(1)} ${top.toFixed(1)} L${(x + w).toFixed(1)} 300Z" fill="${p.d}" opacity="${(.5 + r() * .4).toFixed(2)}"/>`;
+    }
+    for (let i = 0; i < 34; i++) {
+      const x = 40 + r() * 320, y = 60 + r() * 200, k = 1 + r() * 1.6;
+      s += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(k * 4).toFixed(1)}" fill="${p.c}" opacity=".2" filter="url(#blur)"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(k * .9).toFixed(2)}" fill="#fff6c8"/>`;
+    }
+    return s + `<ellipse cx="200" cy="292" rx="220" ry="26" fill="${p.g}" opacity=".2" filter="url(#blur2)"/>`;
+  },
+  glyph(p, r) {
+    let s = `<circle cx="200" cy="140" r="105" fill="url(#glow)" opacity=".8"/><circle cx="200" cy="140" r="88" fill="none" stroke="${p.g}" stroke-width="1.5" stroke-dasharray="2 7"/><circle cx="200" cy="140" r="70" fill="none" stroke="${p.g}" stroke-width="1" opacity=".55"/>`;
+    for (let i = 0; i < 36; i++) {
+      const a = i * 10 * Math.PI / 180, l = i % 3 === 0 ? 12 : 6;
+      s += `<line x1="${(200 + Math.cos(a) * 70).toFixed(1)}" y1="${(140 + Math.sin(a) * 70).toFixed(1)}" x2="${(200 + Math.cos(a) * (70 + l)).toFixed(1)}" y2="${(140 + Math.sin(a) * (70 + l)).toFixed(1)}" stroke="${p.g}" stroke-width="1.2" opacity=".7"/>`;
+    }
+    for (let i = 0; i < 14; i++) {
+      const a = r() * 6.283, d = 96 + r() * 8, x = 200 + Math.cos(a) * d, y = 140 + Math.sin(a) * d;
+      s += `<rect x="${(x - 1.5).toFixed(1)}" y="${(y - 4).toFixed(1)}" width="3" height="8" fill="${p.c}" opacity=".85" transform="rotate(${(a * 57.3 + 90).toFixed(0)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+    }
+    return s + `<path d="M200 82C182 84 174 104 176 124C168 146 152 200 148 268L252 268C248 200 232 146 224 124C226 104 218 84 200 82Z" fill="${p.d}"/><ellipse cx="200" cy="118" rx="12" ry="15" fill="${p.g}" opacity=".2"/><rect y="262" width="400" height="38" fill="${p.d}"/>`;
+  },
+  kingdom(p, r) {
+    let s = `<circle cx="200" cy="140" r="135" fill="url(#glow)"/><circle cx="200" cy="135" r="60" fill="${p.g}" opacity=".28"/><circle cx="200" cy="135" r="44" fill="${p.c}" opacity=".92"/>`;
+    s += `<path d="M0 230L70 160L120 205L170 140L215 210L275 150L330 200L400 150V300H0Z" fill="${p.d}" opacity=".55"/><path d="M0 255L60 215L130 250L200 205L270 250L340 215L400 245V300H0Z" fill="${p.d}" opacity=".85"/>`;
+    s += `<g fill="${p.d}"><rect x="165" y="195" width="70" height="72"/><rect x="155" y="170" width="16" height="97"/><rect x="229" y="170" width="16" height="97"/><rect x="188" y="150" width="24" height="117"/><path d="M152 170L163 148L174 170Z"/><path d="M226 170L237 148L248 170Z"/><path d="M185 150L200 118L215 150Z"/></g>`;
+    s += `<g fill="${p.c}" opacity=".9"><rect x="196" y="176" width="8" height="12"/><rect x="159" y="188" width="6" height="9"/><rect x="235" y="188" width="6" height="9"/></g><rect y="264" width="400" height="36" fill="${p.d}"/>`;
+    return s + stars(r, 26, p.c, 0, 110);
+  },
+  flask(p, r) {
+    const body = 'M188 70L212 70L212 124C258 150 268 208 240 238C222 258 178 258 160 238C132 208 142 150 188 124Z';
+    let s = `<circle cx="200" cy="170" r="125" fill="url(#glow)" opacity=".7"/><defs><clipPath id="fl"><path d="${body}"/></clipPath><linearGradient id="liq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p.g}"/><stop offset="1" stop-color="${p.c}"/></linearGradient></defs>`;
+    s += `<path d="${body}" fill="#fff" fill-opacity=".06" stroke="${p.g}" stroke-width="2.5"/><g clip-path="url(#fl)"><rect x="120" y="184" width="160" height="90" fill="url(#liq)" opacity=".85"/><ellipse cx="200" cy="184" rx="52" ry="6" fill="${p.g}"/>`;
+    for (let i = 0; i < 9; i++) s += `<circle cx="${(165 + r() * 70).toFixed(1)}" cy="${(195 + r() * 50).toFixed(1)}" r="${(1.5 + r() * 3.5).toFixed(1)}" fill="#fff" opacity=".45"/>`;
+    s += `</g><rect x="184" y="63" width="32" height="8" rx="3" fill="${p.c}"/>`;
+    for (let i = 0; i < 22; i++) s += `<circle cx="${(110 + r() * 180).toFixed(1)}" cy="${(40 + r() * 210).toFixed(1)}" r="${(.8 + r() * 1.5).toFixed(1)}" fill="${p.c}" opacity="${(.3 + r() * .6).toFixed(2)}"/>`;
+    return s + `<rect y="266" width="400" height="34" fill="${p.d}"/><ellipse cx="200" cy="266" rx="80" ry="7" fill="${p.g}" opacity=".3" filter="url(#blur)"/>`;
+  },
+  moonring(p, r) {
+    let s = `<circle cx="200" cy="130" r="145" fill="url(#glow)" opacity=".6"/><circle cx="200" cy="130" r="80" fill="${p.a}"/><circle cx="200" cy="130" r="80" fill="none" stroke="${p.g}" stroke-width="12" opacity=".55" filter="url(#blur)"/><circle cx="200" cy="130" r="80" fill="none" stroke="${p.c}" stroke-width="3.5"/><circle cx="200" cy="130" r="62" fill="none" stroke="${p.g}" stroke-width="1" opacity=".5"/>`;
+    s += stars(r, 40, '#fff', 0, 235);
+    s += `<rect y="238" width="400" height="62" fill="${p.d}"/><rect y="238" width="400" height="2" fill="${p.g}" opacity=".55"/>`;
+    for (let i = 0; i < 6; i++) s += `<rect x="${(200 - 60 + i * 8)}" y="${244 + i * 7}" width="${120 - i * 16}" height="1.5" fill="${p.g}" opacity="${(.4 - i * .05).toFixed(2)}"/>`;
+    return s + `<g fill="#01070a"><circle cx="200" cy="203" r="6"/><path d="M193 210h14l3 28h-20z"/></g>`;
+  },
+  hood(p, r) {
+    let s = `<circle cx="235" cy="105" r="125" fill="url(#glow)" opacity=".45"/><circle cx="235" cy="105" r="42" fill="${p.g}" opacity=".35" filter="url(#blur2)"/><circle cx="235" cy="105" r="42" fill="${p.c}"/>`;
+    s += stars(r, 40, '#fff', 0, 190);
+    s += `<path d="M0 300V236H50V210H100V240H150V222H250V200H300V236H400V300Z" fill="${p.d}"/>`;
+    for (let i = 0; i < 9; i++) s += `<rect x="${(8 + r() * 380).toFixed(0)}" y="${(248 + r() * 40).toFixed(0)}" width="5" height="7" fill="#ffd27a" opacity="${(.4 + r() * .5).toFixed(2)}"/>`;
+    return s + `<g fill="#010208"><circle cx="196" cy="160" r="13"/><path d="M182 158Q196 138 212 158L206 172L188 172Z"/><path d="M186 170Q168 205 170 222L234 222Q228 190 210 170Z"/><path d="M205 178L238 190L232 198L202 190Z"/></g>`;
+  },
+  cage(p, r) {
+    let s = `<circle cx="200" cy="160" r="135" fill="url(#glow)" opacity=".7"/>`;
+    for (let i = -6; i <= 6; i++) s += `<path d="M${200 + i * 11} 238Q${200 + i * 15} 150 200 92" fill="none" stroke="${p.c}" stroke-width="2.2"/>`;
+    s += `<ellipse cx="200" cy="192" rx="66" ry="9" fill="none" stroke="${p.c}" stroke-width="2"/><ellipse cx="200" cy="150" rx="46" ry="7" fill="none" stroke="${p.c}" stroke-width="2"/>`;
+    s += `<ellipse cx="200" cy="240" rx="80" ry="12" fill="${p.c}"/><ellipse cx="200" cy="233" rx="80" ry="12" fill="none" stroke="${p.g}" stroke-width="2"/>`;
+    s += `<circle cx="200" cy="82" r="10" fill="none" stroke="${p.c}" stroke-width="3"/><path d="M200 72V24" stroke="${p.c}" stroke-width="2"/><path d="M184 228q8-20 22-9q9-5 9 6z" fill="${p.d}" opacity=".9"/>`;
+    for (let i = 0; i < 20; i++) s += `<circle cx="${(90 + r() * 220).toFixed(0)}" cy="${(40 + r() * 200).toFixed(0)}" r="${(.7 + r() * 1.3).toFixed(1)}" fill="${p.c}" opacity=".5"/>`;
+    return s + `<rect y="264" width="400" height="36" fill="${p.d}"/>`;
+  },
+  galaxy(p, r) {
+    let s = `<g transform="rotate(-24 200 150)"><ellipse cx="200" cy="150" rx="270" ry="55" fill="${p.g}" opacity=".35" filter="url(#blur2)"/><ellipse cx="200" cy="150" rx="210" ry="26" fill="${p.c}" opacity=".45" filter="url(#blur)"/><ellipse cx="200" cy="150" rx="60" ry="16" fill="#fff" opacity=".75" filter="url(#blur)"/><ellipse cx="200" cy="157" rx="180" ry="7" fill="${p.d}" opacity=".6" filter="url(#blur)"/></g>`;
+    s += stars(r, 120, '#fff');
+    for (let i = 0; i < 4; i++) { const x = 90 + r() * 220, y = 50 + r() * 200; s += `<path d="M${x.toFixed(0)} ${(y - 7).toFixed(0)}V${(y + 7).toFixed(0)}M${(x - 7).toFixed(0)} ${y.toFixed(0)}H${(x + 7).toFixed(0)}" stroke="#fff" stroke-width=".8" opacity=".8"/>`; }
+    return s;
+  },
+  runner(p, r) {
+    let s = `<circle cx="250" cy="120" r="150" fill="url(#glow)" opacity=".6"/><circle cx="245" cy="118" r="62" fill="${p.g}" opacity=".9"/><circle cx="245" cy="118" r="62" fill="${p.a}" opacity=".35"/>`;
+    for (let i = 0; i < 16; i++) { const y = 30 + r() * 220, x = r() * 300, len = 40 + r() * 90; s += `<line x1="${x.toFixed(0)}" y1="${y.toFixed(0)}" x2="${(x + len).toFixed(0)}" y2="${y.toFixed(0)}" stroke="${p.c}" stroke-width="1.2" opacity=".28"/>`; }
+    s += stars(r, 30, '#fff', 0, 120);
+    s += `<path d="M0 252L400 232V300H0Z" fill="${p.d}"/>`;
+    return s + `<path d="M178 122Q140 116 104 142Q140 132 176 136Z" fill="${p.g}"/><g fill="${p.d}"><circle cx="190" cy="125" r="12"/><path d="M182 136L204 138L214 186L192 190Z"/><path d="M204 140L234 158L229 167L200 152Z"/><path d="M192 188L176 228L165 225L180 186Z"/><path d="M210 186L232 214L247 210L237 250L226 250L229 221L206 196Z"/></g>`;
+  }
+};
+const ART_KEYS = Object.keys(SCENES);
+const artCache = {};
+function artURI(story, kind) {
+  const key = story.id + '|' + kind + '|' + story.title;
+  if (artCache[key]) return artCache[key];
+  const p = PAL[story.pal] || PAL.glyph;
+  const r = rng(hash(story.id + story.title));
+  const inner = `<defs><linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${p.a}"/><stop offset="1" stop-color="${p.b}"/></linearGradient><radialGradient id="glow"><stop offset="0" stop-color="${p.g}" stop-opacity=".55"/><stop offset="1" stop-color="${p.g}" stop-opacity="0"/></radialGradient><filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3"/></filter><filter id="blur2" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="10"/></filter></defs><rect width="400" height="300" fill="url(#bg)"/>` + (SCENES[story.art] || SCENES.glyph)(p, r);
+  let svg;
+  if (kind === 'cover') {
+    const words = story.title.split(/\s+/), lines = []; let cur = '';
+    for (const w of words) { if ((cur + ' ' + w).trim().length > 11 && cur) { lines.push(cur); cur = w; } else cur = (cur + ' ' + w).trim(); }
+    if (cur) lines.push(cur);
+    const L = lines.slice(0, 4), fs = L.length > 2 ? 16 : 19;
+    const text = L.map((t, i) => `<text x="100" y="${(262 - (L.length - 1 - i) * fs * 1.18).toFixed(1)}" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="${fs}" font-weight="700" fill="#fff" letter-spacing=".4">${esc(t)}</text>`).join('');
+    svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 300"><defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".82"/></linearGradient></defs><svg width="200" height="300" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">${inner}</svg><rect y="150" width="200" height="150" fill="url(#fade)"/>${text}<text x="100" y="284" text-anchor="middle" font-family="Georgia,serif" font-size="8.5" fill="#d6e3ee" opacity=".85" letter-spacing=".6">${esc(story.author)}</text></svg>`;
+  } else {
+    svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><svg width="320" height="180" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">${inner}</svg></svg>`;
+  }
+  return artCache[key] = 'data:image/svg+xml,' + encodeURIComponent(svg).replace(/[!'()*]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase());
+}
+function img(s, kind, alt = '') {
+  const fb = artURI(s, kind === 'cover' ? 'cover' : 'wide');
+  const useRemote = !!s.cover;
+  return `<img src="${useRemote ? esc(s.cover) : fb}" ${useRemote ? `data-fb="${fb}"` : ''} alt="${esc(alt)}" loading="lazy" decoding="async">`;
+}
+document.addEventListener('error', e => {
+  const t = e.target;
+  if (t && t.tagName === 'IMG' && t.dataset.fb) { const f = t.dataset.fb; delete t.dataset.fb; t.src = f; }
+}, true);
+
+/* =====================================================================
+   Story data (pre-loaded)
+   ===================================================================== */
+const BASE = [
+  { id:'echoes-of-tomorrow', title:'Echoes of Tomorrow', author:'Marcus Wright', genre:'Sci-Fi', tag:'time', rating:4.8, views:12400, art:'moonring', pal:'moonring',
+    summary:'Every night, Dr. Amara Osei\'s lab records a lecture she has not given yet. Each recording lands a little closer to today.',
+    chapters:[
+      { title:'The Recording', text:`The first recording appeared on a Tuesday, timestamped six months ahead. Amara Osei assumed a clock error and filed a ticket with facilities, who replied that the lab's servers were perfectly synchronized and would she please stop opening tickets about the future.
+
+The second appeared on Wednesday, timestamped five months and twenty-nine days ahead. It showed a lecture hall, an audience she did not recognize, and her own voice explaining something she had not yet worked out. She was older in the video. Her hands shook slightly around the marker, and she kept glancing toward the door as if waiting for someone to stop her.
+
+By Friday the gap had narrowed to five months. Amara stopped watching the recordings and began counting them instead. At this rate, the lecture would arrive on a Thursday in March, and the woman on the screen looked very much like someone who had not slept since the series began.` },
+      { title:'Signal Drift', text:`She wrote the number on the whiteboard: one hundred and seventy-eight days. Then she wrote a second number beneath it, the count of recordings remaining, and noticed with a coldness that spread up her arms that the two numbers were converging. The recordings were not merely coming closer in time. They were coming faster.
+
+"You already know what to do," said the older Amara in that night's video, addressing the camera directly for the first time. "I recorded these so you would stop trusting the clock and start trusting the pattern. Turn the servers off, and I can still reach you. Leave them on, and someone else will hear this too." The recording ended, and every monitor in the lab went quietly dark.` }
+    ] },
+  { id:'midnight-thief', title:'Midnight Thief', author:'Sophia Chen', genre:'Mystery', tag:'heist', rating:4.7, views:11900, art:'hood', pal:'hood',
+    summary:'A cat burglar who never keeps what she steals finds that the third item on her list was taken the night before she arrived.',
+    chapters:[
+      { title:'Rooftops After Twelve', text:`Lin Verrault liked the city best after midnight, when the streetlights hummed to themselves and every rooftop became a road only she knew how to travel. She carried three tools, one plan, and a rule she had never broken: she stole only for the client, and she never, ever looked at the merchandise.
+
+The Aldermere Museum's east skylight had been unlocked for her by someone who preferred to remain anonymous, which was a lie that clients told themselves and thieves accepted. She lowered herself into the sleeping gallery on a thread of black line, boots silent on the marble, and counted the paces to the display case holding the Marlowe Locket.
+
+The case was open. The velvet inside was still faintly warm, and pressed into it, precisely where the locket should have been, lay a small white card with a single line of handwriting. It said: You're late, Lin. Nobody had ever used her name on a job. Somewhere in the museum a floorboard creaked, and she was suddenly not sure she was the hunter here.` },
+      { title:'The Card', text:`She read the card twice, then turned it over. On the back, in the same tidy hand, was a list of three addresses. The first was the flat she had rented under a false name last spring. The second was a locker she had told no one about. The third was the rooftop she was standing under at that very moment.
+
+Lin pocketed the card and did the one sensible thing left to a professional in her position. She stopped moving, controlled her breathing, and listened for whoever was listening back. Above her, at the edge of the skylight, a second thread of black line was slowly unspooling into the gallery.` }
+    ] },
+  { id:'the-gilded-cage', title:'The Gilded Cage', author:'Clara Evans', genre:'Drama', tag:'family', rating:4.9, views:10300, art:'cage', pal:'cage',
+    summary:'Three sisters inherit a shuttered opera house, and the secrets their mother sang over for thirty years.',
+    chapters:[
+      { title:'Curtain Call', text:`The Marchetti Opera House had been closed for eleven years, but the birdcage in the lobby was still occupied. No one could say who had been feeding the canary. Clara, the eldest of the three sisters, noticed it first, because Clara noticed everything first and forgave nothing afterward.
+
+They had come for the reading of their mother's will, arriving in separate cars and a shared silence. Ottilie brought a lawyer's briefcase and a lawyer's suspicion. Bea, the youngest, brought a cardboard box of their mother's records and their mother's stubborn hope. The gilded cage hung between them at the foot of the grand stair, its little door open, its little bird singing as though the house were full.
+
+Their mother had left them the building, the debts, and a sealed envelope for each. Ottilie wanted to sell before the ink dried. Bea wanted to raise the curtain one last time. Clara stood beneath the cage and listened to the canary sing the aria their mother had never once performed in public, and wondered who had taught it.` },
+      { title:'Three Envelopes', text:`The envelopes were opened that evening on the empty stage, under a single work light, each sister taking a different row of the dusty stalls as if the seating chart still mattered. Ottilie's held a bank statement. Bea's held a photograph. Clara's held nothing but a pressed feather and a line in their mother's careful script: Ask them what the singing was for.
+
+For a long moment none of them spoke. In the lobby the canary broke off mid-phrase, and the old house settled around them with the small dry sounds of a place that has been holding its breath for a very long time.` }
+    ] },
+  { id:'stardust-drifter', title:'Stardust Drifter', author:'Orion Blake', genre:'Sci-Fi', tag:'salvage', rating:4.8, views:9600, art:'galaxy', pal:'galaxy',
+    summary:'A salvage pilot follows a trail of stardust across the outer rim and finds a ship that has been waiting for her.',
+    chapters:[
+      { title:'Dust Trail', text:`Captain Nyra Okonkwo made her living from things other people had abandoned, and the Outer Rim was full of them. Broken haulers, silent stations, wreckage older than the treaties that named it. She pulled her rig into the shadow of a dead moon and killed the engines to save fuel, and that was when she first saw the dust.
+
+It hung in the dark like breath on cold glass, a faint silver ribbon threading between the stars in a line too straight to be natural. Her sensors read it as ordinary micrometeorite debris. Her instincts, honed over nineteen years of finding what the void tried to keep, read it as a road.
+
+Nyra had named her ship Drifter for a reason, and she had never once followed a trail she could not afford to lose. She checked the fuel gauge, swore softly at what it said, and turned the bow toward the silver line. Far ahead, where the ribbon ended, something large and patient was beginning to glow.` },
+      { title:'The Waiting Ship', text:`The vessel was old beyond her catalogues, its hull a mosaic of plates from a dozen extinct fleets, welded together with a craftsmanship that made her chest ache. There were no markings and no running lights. But as the Drifter drew near, a hatch opened in the hull, slowly, like an eyelid, and the interior lit one soft lamp at a time along a path leading toward the bridge.
+
+"Welcome back, Captain," said a voice that was not quite a voice, and Nyra realized with a chill that had nothing to do with the cold that she had never been here in her life, and that the ship had spoken as though she had been away for a very long while.` }
+    ] },
+  { id:'void-runner', title:'Void Runner', author:'Jax Reed', genre:'Sci-Fi', tag:'contraband', rating:4.6, views:8800, art:'runner', pal:'runner',
+    summary:'Kestrel runs contraband through the collapsed gates of the Void, where the only law is momentum.',
+    chapters:[
+      { title:'Momentum', text:`There were nine ways to die running the Void, and Kestrel had personally survived seven. The gates had collapsed a generation ago, leaving a debris field of half-dead space where gravity pooled and spat without warning, and where anyone with a fast ship and a slow conscience could make a fortune carrying what the Authority wanted kept out.
+
+Tonight's cargo was small, sealed, and warm to the touch. The broker had not told her what it was, which she preferred, and had doubled the fee, which she did not. She strapped in, killed her transponder, and fed the thrusters until the ship began to shudder like a wire in the wind. "Momentum," she whispered, the only prayer she trusted. "Don't stop, don't stop, don't stop."
+
+The first gate ruin rose out of the dark, a torn ring of alloy the size of a city, and Kestrel threaded through its broken teeth at a speed that made her instruments scream. Behind her, three Authority interceptors lit their engines and fell in line. Ahead, the second ring was already coming apart.` },
+      { title:'Slingshot', text:`She had one move left, and it was a bad one. The pool of gravity beneath the second ring could throw her clear of the pursuit if she rode its edge exactly right, and it would tear her ship in half if she was off by a single degree. Kestrel flexed her hands on the stick and let the cargo's soft warmth remind her what she was carrying.
+
+"Ten seconds," said the ship. "Nine." Kestrel did not answer. She was busy remembering every run she had ever made and every run she had ever lost, and folding them all, at the last possible moment, into a single clean line through the dark.` }
+    ] },
+  { id:'the-whispering-woods', title:'The Whispering Woods', author:'Eleanor Vance', genre:'Fantasy', tag:'enchanted', rating:4.9, views:18200, art:'forest', pal:'forest', line:'A magical fantasy adventure',
+    summary:'When the lanterns of Hollowmere go dark, a mapmaker\'s apprentice follows the fireflies into a forest that remembers every traveler.',
+    chapters:[
+      { title:'The Lanterns Go Out', text:`On the last night of autumn, the lanterns of Hollowmere went out one by one, as though something patient were walking the length of the village and pinching each flame between two fingers. Wren Aldous stood at the window of the mapmaker's loft with a half-inked coastline drying under her hand, and she counted the darkness as it came.
+
+By the time it reached her street, the fireflies had already begun to gather at the edge of the woods. They did not drift the way fireflies should. They hung in a slow spiral, all facing the same direction, and when Wren lifted her lamp they dimmed politely, like guests caught talking about someone who had just walked in.
+
+Her master had told her never to draw the Whispering Woods, for a forest that is mapped is a forest that has been invited. Wren folded the coastline into her satchel, pulled on her boots, and stepped out to meet the lights. Behind her, in the loft, the blank page began to fill itself with trees.` },
+      { title:'What the Roots Remember', text:`The path did not begin at the treeline so much as begin to exist there, unrolling under her boots one step ahead of her. With every stride the trunks leaned closer, and the whispering that had sounded like wind resolved into her own name, spoken in voices she almost recognized. Old Tamsin the woodcutter. Her mother. A boy from the orphans' ward who had wandered off years ago and never been found.
+
+"You are not lost," said the largest of the oaks, in a voice like a door closing in another house. "You are being remembered. It is not the same thing, and it is not always kind." Wren tightened her grip on the lamp and asked the only question that seemed to matter: what did the forest want in return?` }
+    ] },
+  { id:'the-shadow-cipher', title:'The Shadow Cipher', author:'Julian Mercer', genre:'Sci-Fi', tag:'cipher', rating:4.8, views:15700, art:'glyph', pal:'glyph', line:'A signal older than the stars',
+    summary:'A signals analyst discovers that the static on a dead deep-space channel is a message that has been decrypting itself for forty years.',
+    chapters:[
+      { title:'Noise Floor', text:`Station Tern-9 listened to the dark for a living. Its dishes were pointed at nothing in particular, and its analysts were paid to notice when nothing in particular started to sound like something. Ines Calloway had worked the night shift for six years without noticing anything at all, which was why she nearly missed it.
+
+It was a pattern in the noise floor, faint as a pulse under skin. Every 4,096 seconds, the static on Channel Nine flattened into a perfect square wave and then relaxed again. She ran the standard filters, and then the nonstandard ones. The square wave survived every one of them. It was not hiding from her. It was waiting for her to ask the right question.
+
+At 03:12 station time she pulled the archive and found the same pulse in the logs going back four decades, unflagged, uncommented, sitting in plain sight like a signature on a forged painting. Someone had built a cipher out of silence. And whoever it was had made sure that only someone bored enough to look would find the door.` },
+      { title:'Key Exchange', text:`The first block decrypted a little after dawn, while the station's coffee machine was still muttering through its morning cycle. Ines expected coordinates, or a warning, or a name. What scrolled across her screen was seven words: THE KEY IS WHOEVER IS LISTENING.
+
+She read it three times, and on the fourth pass she understood the design. The cipher had no fixed key. It had been built to open for a specific kind of attention, and every analyst who had glanced at Channel Nine and looked away had simply not been the right listener. She had been, by accident, for six years. Now the pulse had stopped waiting, and the next block was already unpacking itself.` }
+    ] },
+  { id:'chronicles-of-aloria', title:'Chronicles of Aloria', author:'Kaelen Voss', genre:'Sci-Fi', tag:'colonies', rating:4.7, views:14100, art:'kingdom', pal:'kingdom', line:'Three colonies. One dying sun.',
+    summary:'Three stranded colonies, one dying sun, and the archivist who must decide which history is worth carrying across the dark.',
+    chapters:[
+      { title:'The Weight of Memory', text:`The colony ships of Aloria had been falling toward their sun for two hundred years, and in all that time no one had been brave enough to say the word aloud. Mirel Tann said it on the morning of her appointment as Archivist, standing in the vaulted records hall of Vael, where the walls were lined with every name, law, and lullaby the settlers had carried from Earth.
+
+"Triage," she told the Council, and watched their faces close like doors. The engines could lift only one colony's worth of cargo into the outer transit lane. Three settlements would compete for that space, and each would want its own history saved first: Vael's archives, the Kessan farmers' seed-songs, the Drift Guild's charts of every safe current between stars.
+
+Mirel had spent her life cataloguing what people had lost. She had never imagined she would be asked to choose what they would keep. That night she walked the stacks alone, lantern raised, reading spines she had known since childhood, and understood that the decision would not be made by argument. It would be made by whoever was willing to carry the cost of being remembered as the one who decided.` },
+      { title:'Three Petitions', text:`The petitions arrived before the week was out, each sealed in the colony's own wax. Vael sent legal briefs, immaculate and cold. The Kessan delegation sent a child with a jar of seeds and instructions to say nothing. The Drift Guild sent a single navigator, who set an antique star chart on Mirel's desk and traced a line across it with one scarred finger.
+
+"Every colony thinks it is asking for its past," the navigator said. "Really, we are asking you to promise we have a future. Save the charts, and there is somewhere to go. Save the songs, and there is a reason to arrive." Mirel looked at the chart, the jar, the briefs, and realized that the Council had given her a question with three right answers.` }
+    ] },
+  { id:'the-last-alchemist', title:'The Last Alchemist', author:'Lyra Belacqua', genre:'Fantasy', tag:'forbidden', rating:4.8, views:13300, art:'flask', pal:'flask', line:'Some crafts refuse to stay buried',
+    summary:'In a city that outlawed transmutation, Orsolya Vint brews the one formula that could bring it back, and the Guild that wants it buried.',
+    chapters:[
+      { title:'Lead and Lamplight', text:`Thirty years after the Guild banned transmutation, Orsolya Vint still kept a small furnace behind the false wall of her apothecary, and she still fed it every night at the hour when the lamplighters passed. It was a foolish, stubborn habit. Her mentor had been hanged for less. But there are crafts you do not so much practice as keep company with, and hers had never once abandoned her.
+
+Tonight the furnace was burning the wrong color. Where there should have been the honest orange of coal there was a thin, steady blue, like a flame seen through deep water. Orsolya set down her tongs. In the crucible, a dull lump of lead had begun to sing, a note so faint she felt it in her teeth before she heard it, and the surface of the metal was turning slowly, patiently, to light.
+
+She had spent three decades believing the old texts were metaphors. The Great Work as a change of the soul, gold as a name for wisdom. She stood very still and listened to the lead become something else, and somewhere in the streets above, a bell began to ring the Guild's alarm.` },
+      { title:'The Guild Knocks', text:`They did not break the door. Guildmaster Halvard Crewe had never needed to. He simply knocked, twice, in the polite rhythm of a man who has already won, and waited for Orsolya to open the apothecary as if for a customer. "You have been burning blue," he said, warm as a hearth. "The whole quarter can see it from the rooftops."
+
+"It is a chimney fire," said Orsolya. Crewe smiled at her the way one smiles at a clever child. "Then you will not mind if my people look at the chimney." Behind the false wall the crucible sang on, and Orsolya began to calculate how many steps lay between her and the back stair, and how many years lay between her and anyone who would believe her.` }
+    ] }
+];
+const RELEASE_ORDER = ['the-shadow-cipher', 'chronicles-of-aloria', 'the-last-alchemist', 'the-whispering-woods', 'stardust-drifter'];
+const FEATURED = ['the-whispering-woods', 'the-last-alchemist'];
+const SEED_PROGRESS = {
+  'the-shadow-cipher':    { pct:68, chapter:28, t:3 },
+  'chronicles-of-aloria': { pct:42, chapter:22, t:2 },
+  'the-last-alchemist':   { pct:15, chapter:15, t:1 }
+};
+const GENRES = [
+  { n:'Fantasy',    i:'sparkles', c:'#5eead4', bg:'rgba(45,212,191,.11)',  bd:'rgba(45,212,191,.35)' },
+  { n:'Sci-Fi',     i:'atom',     c:'#86b6ff', bg:'rgba(59,130,246,.12)',  bd:'rgba(80,140,250,.38)' },
+  { n:'Mystery',    i:'user',     c:'#cbd5e1', bg:'rgba(148,163,184,.10)', bd:'rgba(148,163,184,.28)' },
+  { n:'Romance',    i:'heart',    c:'#ff8fb0', bg:'rgba(190,50,90,.16)',   bd:'rgba(236,72,120,.4)' },
+  { n:'Adventure',  i:'compass',  c:'#6ee7a0', bg:'rgba(34,197,94,.11)',   bd:'rgba(34,197,94,.36)' },
+  { n:'Historical', i:'landmark', c:'#f0c27a', bg:'rgba(217,150,60,.13)',  bd:'rgba(217,150,60,.38)' }
+];
+const SIZES = [16, 18, 20, 23];
+
+/* =====================================================================
+   State
+   ===================================================================== */
+function cleanUploaded(list) {
+  if (!Array.isArray(list)) return [];
+  return list.filter(s => s && typeof s.id === 'string' && typeof s.title === 'string' && typeof s.author === 'string' &&
+    Array.isArray(s.chapters) && s.chapters.length && s.chapters.every(c => c && typeof c.text === 'string'))
+    .map(s => {
+      const key = ART_KEYS[hash(s.title + s.author) % ART_KEYS.length];
+      return { id: s.id, title: s.title, author: s.author, genre: String(s.genre || 'Fiction'), summary: String(s.summary || ''),
+        chapters: s.chapters.map(c => ({ title: String(c.title || ''), text: c.text })), cover: typeof s.cover === 'string' ? s.cover : '',
+        rating: null, views: 0, tag: 'new', uploaded: true, art: key, pal: key };
+    });
+}
+const state = {
+  uploaded: [],
+  shelf: new Set(store.get('sw_shelf', [])),
+  progress: Object.assign({}, SEED_PROGRESS, store.get('sw_progress', {})),
+  size: Math.min(Math.max(parseInt(store.get('sw_size', 1), 10) || 0, 0), 3),
+  dev: false, devPw: '', nav: 'home', filter: { type: 'all' }, hero: 0, reader: null
+};
+const allStories = () => [...state.uploaded, ...BASE];
+const byId = id => allStories().find(s => s.id === id);
+let lastFocus = null;
+
+/* =====================================================================
+   Rendering
+   ===================================================================== */
+function renderHero() {
+  const s = byId(FEATURED[state.hero]) || byId(FEATURED[0]);
+  const saved = state.shelf.has(s.id);
+  $('#hero').innerHTML = `<div class="hero" style="--art:url('${artURI(s, 'wide')}')">
+    <div class="hero-cover">${img(s, 'cover', s.title + ' cover')}</div>
+    <div class="hero-copy">
+      <p class="kicker">Featured Today:</p>
+      <h1>${esc(s.title)}</h1>
+      <p class="sub">${esc(s.line || 'A ' + s.genre.toLowerCase() + ' story')} by ${esc(s.author)}</p>
+      <div class="hero-actions">
+        <button class="btn primary" data-open="${s.id}">Start Reading</button>
+        <button class="btn ghost" data-shelf="${s.id}" aria-pressed="${saved}">${ic(saved ? 'check' : 'bookmark')}${saved ? 'On Bookshelf' : 'Add to Bookshelf'}</button>
+      </div>
+    </div>
+    <div class="dots" role="group" aria-label="Featured stories">${FEATURED.map((f, i) => `<button data-hero="${i}" aria-label="Show featured story ${i + 1}" ${i === state.hero ? 'aria-current="true"' : ''}></button>`).join('')}</div>
+  </div>`;
+}
+function continueList() {
+  return Object.entries(state.progress).map(([id, p]) => ({ s: byId(id), p })).filter(x => x.s && p_ok(x.p)).sort((a, b) => b.p.t - a.p.t).slice(0, 3);
+}
+const p_ok = p => p && typeof p.pct === 'number' && typeof p.chapter === 'number';
+function renderContinue() {
+  const list = continueList();
+  $('#continue').hidden = !list.length;
+  $('#continue').innerHTML = `<h2 class="sec-h" id="continueH">Continue Reading</h2><div class="cont-row">${list.map(({ s, p }) => `
+    <button class="cont" data-resume="${s.id}" aria-label="Continue reading ${esc(s.title)}, ${p.pct} percent">
+      <span class="cont-cover">${img(s, 'cover')}</span>
+      <span class="cont-body"><strong>${esc(s.title)}</strong><small>Chapter ${p.chapter}</small>
+        <span class="bar-row"><span class="bar"><i style="width:${p.pct}%"></i></span><b>${p.pct}%</b></span></span>
+    </button>`).join('')}</div>`;
+}
+function renderGenres() {
+  const f = state.filter;
+  $('#genres').innerHTML = `<h2 class="sec-h" id="genresH">Trending Genres</h2><div class="genre-row">${GENRES.map(g =>
+    `<button class="pill" style="--c:${g.c};--bg-t:${g.bg};--bd:${g.bd}" data-genre="${g.n}" aria-pressed="${f.type === 'genre' && f.value.toLowerCase() === g.n.toLowerCase()}">${ic(g.i)}<span>${g.n}</span></button>`).join('')}</div>`;
+}
+function filtered() {
+  const f = state.filter, all = allStories();
+  const order = [...state.uploaded, ...BASE];
+  const ids = new Set(order.map(s => s.id));
+  const base = order.filter(s => ids.has(s.id));
+  if (f.type === 'genre') return base.filter(s => s.genre.toLowerCase() === f.value.toLowerCase());
+  if (f.type === 'author') return base.filter(s => s.author === f.value);
+  if (f.type === 'shelf') return base.filter(s => state.shelf.has(s.id));
+  if (f.type === 'search') { const q = f.value.toLowerCase(); return base.filter(s => [s.title, s.author, s.genre, s.tag, s.summary].join(' ').toLowerCase().includes(q)); }
+  return all === base ? base : base;
+}
+function cardHTML(s) {
+  const dev = state.dev && s.uploaded;
+  return `<article class="card" data-open="${s.id}" tabindex="0" aria-label="Read ${esc(s.title)} by ${esc(s.author)}">
+    <div class="thumb">${img(s, 'wide')}${state.shelf.has(s.id) ? `<span class="saved-mark" title="On your bookshelf">${ic('bookmark')}</span>` : ''}${dev ? `<button class="del" data-del="${s.id}" aria-label="Delete ${esc(s.title)}">${ic('x')}</button>` : ''}</div>
+    <h3>${esc(s.title)}</h3>
+    <div class="meta"><span class="rate">${s.rating ? ic('star', 'fill') + s.rating.toFixed(1) : '<span class="new">New</span>'}</span><span class="views">${ic('eye')}${fmtViews(s.views)}</span></div>
+    <div class="tags"><span>${esc(s.genre.toLowerCase())}</span><span>${esc(s.tag || 'story')}</span></div>
+  </article>`;
+}
+function renderPopular() {
+  const f = state.filter, list = filtered(), wrap = f.type !== 'all';
+  const title = { all:'Popular Stories This Week', genre:`${f.value} stories`, author:`Stories by ${f.value}`, shelf:'My Bookshelf', search:`Results for \u201c${f.value}\u201d` }[f.type];
+  const emptyMsg = f.type === 'shelf' ? 'Your bookshelf is empty. Choose “Add to Bookshelf” on any story to save it here.' : 'No stories match yet. Try another title, genre, or author.';
+  $('#popular').innerHTML = `<div class="sec-head"><h2 class="sec-h" id="popularH">${esc(title)}</h2>
+    <div class="sec-tools">${wrap ? `<button class="link" data-act="clear-filter">Show all stories</button>` : `<button class="arrow" data-act="scroll-prev" aria-label="Scroll left">${ic('left')}</button><button class="arrow" data-act="scroll-next" aria-label="Scroll right">${ic('right')}</button>`}</div></div>
+    <div class="track ${wrap ? 'wrap' : ''}" id="track">${list.length ? list.map(cardHTML).join('') : `<p class="empty">${emptyMsg}</p>`}</div>`;
+}
+function renderRail() {
+  const list = [...state.uploaded, ...RELEASE_ORDER.map(byId)].filter(Boolean);
+  $('#rel').innerHTML = list.map(s => `<button class="rel" data-open="${s.id}"><span class="rel-cover">${img(s, 'cover')}</span><span><strong>${esc(s.title)}</strong><small>${esc(s.genre)}</small></span></button>`).join('');
+}
+function renderSide() {
+  $('.side-nav').innerHTML = `<button data-nav="home">${ic('book')}My Reads</button><button data-nav="genres">${ic('grid')}Genres</button><button data-nav="shelf">${ic('bookmark')}Saved Stories</button>`;
+}
+function renderNav() {
+  const map = { home:'home', genres:'genres', authors:'authors', shelf:'shelf' };
+  $$('.nav button, .side-nav button').forEach(b => {
+    if (map[b.dataset.nav] === state.nav) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
+  });
+}
+function renderDev() {
+  $('#dev').innerHTML = state.dev
+    ? `<span class="ok-badge" role="status"><i></i>Developer Mode Active</span><button class="dev-exit" data-act="exit-dev">Exit developer mode</button>`
+    : `<button class="dev-btn" data-act="dev">${ic('lock')}Developer Mode</button>`;
+  $('#uploadBtn').hidden = !state.dev;
+}
+function renderAll() { renderHero(); renderContinue(); renderGenres(); renderPopular(); renderRail(); renderSide(); renderNav(); renderDev(); }
+
+/* =====================================================================
+   Toast & modals
+   ===================================================================== */
+let toastTimer;
+function toast(msg, bad) {
+  const root = $('#toastRoot'); root.innerHTML = `<div class="toast ${bad ? 'bad' : ''}">${esc(msg)}</div>`;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { root.innerHTML = ''; }, 3600);
+}
+function setInert(on) { const p = $('#page'); if ('inert' in p) p.inert = on; }
+function openModal(html, focusSel) {
+  lastFocus = document.activeElement;
+  $('#modalRoot').innerHTML = `<div class="overlay" data-act="overlay">${html}</div>`;
+  setInert(true); document.body.classList.add('lock');
+  const f = $(focusSel, $('#modalRoot')); if (f) f.focus();
+}
+function closeModal() {
+  $('#modalRoot').innerHTML = '';
+  if (!state.reader) { setInert(false); document.body.classList.remove('lock'); }
+  if (lastFocus && lastFocus.isConnected) lastFocus.focus();
+}
+const modalOpen = () => !!$('#modalRoot').firstElementChild;
+
+function openPassword() {
+  openModal(`<form class="modal" data-form="pw" role="dialog" aria-modal="true" aria-labelledby="mt" novalidate>
+    <h2 id="mt">Developer Mode</h2><p class="lede">Enter the editor password to upload stories.</p>
+    <div class="field"><label for="pw">Password</label><input id="pw" name="pw" type="password" autocomplete="off"><p class="err" data-err role="alert" hidden></p></div>
+    <div class="row"><button type="button" class="btn ghost small" data-act="close-modal">Cancel</button><button type="submit" class="btn primary small">Unlock</button></div></form>`, '#pw');
+}
+async function submitPassword(form) {
+  const pwEl = form.elements.pw, btn = $('button[type=submit]', form), err = $('[data-err]', form);
+  const fail = msg => { err.textContent = msg; err.hidden = false; pwEl.setAttribute('aria-invalid', 'true'); btn.disabled = false; pwEl.focus(); pwEl.select(); };
+  if (!pwEl.value) return fail('Enter the password.');
+  btn.disabled = true; err.hidden = true;
+  try {
+    const r = await fetch('/api/auth', { method: 'POST', headers: { 'x-dev-password': pwEl.value } });
+    if (r.status === 401) return fail('That password isn\u2019t right. Check it and try again.');
+    if (!r.ok) return fail('The server had a problem. Try again in a moment.');
+    state.dev = true; state.devPw = pwEl.value;
+    closeModal(); renderDev(); renderPopular(); toast('Developer Mode Active. You can now upload stories.');
+    migrateLocal();
+  } catch (e) { fail('Can\u2019t reach the server. Check your connection and try again.'); }
+}
+function openUpload() {
+  if (!state.dev) return;
+  const genres = ['Fantasy', 'Sci-Fi', 'Mystery', 'Romance', 'Adventure', 'Historical', 'Drama', 'Horror', 'Thriller'];
+  openModal(`<form class="modal wide" data-form="upload" role="dialog" aria-modal="true" aria-labelledby="mt" novalidate>
+    <h2 id="mt">Upload a story</h2><p class="lede">It appears in Popular Stories This Week for every visitor.</p>
+    <div class="two">
+      <div class="field"><label for="f-title">Title</label><input id="f-title" name="title" maxlength="90" autocomplete="off"><p class="err" data-err="title" hidden></p></div>
+      <div class="field"><label for="f-author">Author</label><input id="f-author" name="author" maxlength="70" autocomplete="off"><p class="err" data-err="author" hidden></p></div>
+    </div>
+    <div class="two">
+      <div class="field"><label for="f-genre">Genre</label><input id="f-genre" name="genre" list="genreList" maxlength="30" autocomplete="off"><datalist id="genreList">${genres.map(g => `<option value="${g}">`).join('')}</datalist><p class="err" data-err="genre" hidden></p></div>
+      <div class="field"><label for="f-cover">Cover image URL <span style="color:var(--muted);font-weight:400">(optional)</span></label><input id="f-cover" name="cover" type="url" placeholder="https://" autocomplete="off"><p class="err" data-err="cover" hidden></p></div>
+    </div>
+    <div class="field"><label for="f-summary">Summary</label><textarea id="f-summary" name="summary" rows="3" maxlength="400"></textarea><p class="err" data-err="summary" hidden></p></div>
+    <div class="field"><label for="f-text">Full text / chapter content</label><textarea id="f-text" name="text" rows="9"></textarea>
+      <p class="hint">To split into chapters, put a line containing only --- between them. Start a chapter with a line like “Chapter 2: Title” to name it.</p><p class="err" data-err="text" hidden></p></div>
+    <p class="err" data-err="form" role="alert" hidden></p>
+    <div class="row"><button type="button" class="btn ghost small" data-act="close-modal">Cancel</button><button type="submit" class="btn primary small">Publish story</button></div></form>`, '#f-title');
+}
+function parseChapters(raw) {
+  return raw.split(/^[ \t]*---[ \t]*$/m).map(p => p.trim()).filter(Boolean).map((part, i) => {
+    const lines = part.split('\n'), first = lines[0].trim();
+    if (lines.length > 1 && (/^chapter\b/i.test(first) || /^#{1,3}\s+/.test(first)) && first.length < 90) {
+      return { title: first.replace(/^#{1,3}\s+/, '').replace(/^chapter\s*\d*\s*[:.\-–—]?\s*/i, '').trim() || `Chapter ${i + 1}`, text: lines.slice(1).join('\n').trim() };
+    }
+    return { title: `Chapter ${i + 1}`, text: part };
+  }).filter(c => c.text);
+}
+async function submitUpload(form) {
+  if (!state.dev) { closeModal(); return; }
+  const E = form.elements, v = { title: E.title.value.trim(), author: E.author.value.trim(), genre: E.genre.value.trim(), cover: E.cover.value.trim(), summary: E.summary.value.trim(), text: E.text.value.trim() };
+  const errs = {};
+  if (!v.title) errs.title = 'Add a title.';
+  if (!v.author) errs.author = 'Add the author\u2019s name.';
+  if (!v.genre) errs.genre = 'Choose or type a genre.';
+  if (v.cover && !/^https?:\/\//i.test(v.cover)) errs.cover = 'Use a link that starts with http:// or https://.';
+  if (!v.summary) errs.summary = 'Add a short summary.';
+  if (!v.text) errs.text = 'Paste the story text.';
+  $$('[data-err]', form).forEach(e => {
+    const k = e.dataset.err; if (k === 'form') { e.hidden = true; return; }
+    e.hidden = !errs[k]; e.textContent = errs[k] || ''; const inp = form.elements[k]; if (inp) inp.setAttribute('aria-invalid', errs[k] ? 'true' : 'false');
+  });
+  const bad = Object.keys(errs)[0];
+  if (bad) { form.elements[bad].focus(); return; }
+  const btn = $('button[type=submit]', form), formErr = $('[data-err=form]', form);
+  btn.disabled = true; btn.textContent = 'Publishing\u2026';
+  const reset = msg => { btn.disabled = false; btn.textContent = 'Publish story'; formErr.textContent = msg; formErr.hidden = false; };
+  try {
+    const r = await fetch('/api/stories', { method: 'POST', headers: { 'content-type': 'application/json', 'x-dev-password': state.devPw },
+      body: JSON.stringify({ title: v.title, author: v.author, genre: v.genre, cover: v.cover, summary: v.summary, chapters: parseChapters(v.text) }) });
+    if (r.status === 401) { state.dev = false; state.devPw = ''; closeModal(); renderDev(); renderPopular(); return toast('The server rejected the password. Unlock Developer Mode again.', true); }
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) return reset(data.error || 'The server couldn\u2019t save the story. Try again.');
+    const [story] = cleanUploaded([data.story]);
+    state.uploaded.unshift(story);
+    state.filter = { type: 'all' }; state.nav = 'home'; $('#q').value = '';
+    closeModal(); renderAll();
+    const track = $('#track'); if (track) track.scrollLeft = 0;
+    toast(`\u201c${story.title}\u201d is live for every visitor.`);
+  } catch (e) { reset('Can\u2019t reach the server. Check your connection and try again.'); }
+}
+async function deleteStory(id) {
+  try {
+    const r = await fetch('/api/stories?id=' + encodeURIComponent(id), { method: 'DELETE', headers: { 'x-dev-password': state.devPw } });
+    if (!r.ok && r.status !== 404) throw new Error('delete failed');
+  } catch (e) { return toast('Couldn\u2019t remove the story. Try again.', true); }
+  state.uploaded = state.uploaded.filter(s => s.id !== id); state.shelf.delete(id); delete state.progress[id];
+  store.set('sw_shelf', [...state.shelf]); store.set('sw_progress', state.progress);
+  renderAll(); toast('Story removed.');
+}
+function openAuthors() {
+  const map = {}; allStories().forEach(s => { (map[s.author] = map[s.author] || []).push(s); });
+  const names = Object.keys(map).sort((a, b) => a.localeCompare(b));
+  openModal(`<div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><h2 id="mt">Authors</h2><p class="lede">Pick an author to see their stories.</p>
+    <div class="author-list">${names.map(n => `<button data-author="${esc(n)}"><span>${esc(n)}</span><small>${map[n].length} ${map[n].length === 1 ? 'story' : 'stories'}</small></button>`).join('')}</div>
+    <div class="row"><button class="btn ghost small" data-act="close-modal">Close</button></div></div>`, '.author-list button');
+}
+
+/* =====================================================================
+   Reader
+   ===================================================================== */
+let saveTimer;
+function persistProgress() { clearTimeout(saveTimer); saveTimer = setTimeout(() => store.set('sw_progress', state.progress), 300); }
+function recordProgress(frac) {
+  const rd = state.reader; if (!rd) return;
+  const s = byId(rd.id), n = s.chapters.length;
+  const pct = Math.max(1, Math.min(100, Math.round(((rd.ch + frac) / n) * 100)));
+  state.progress[rd.id] = { pct, chapter: rd.ch + 1, t: Date.now() };
+  $('#rBar').style.width = pct + '%';
+  persistProgress();
+}
+function applySize() {
+  $('#reader').style.setProperty('--read-size', SIZES[state.size] + 'px');
+  $$('.seg button').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.size === state.size)));
+}
+function openReader(id, opts = {}) {
+  const s = byId(id); if (!s) return;
+  let ch = 0;
+  if (opts.resume && p_ok(state.progress[id])) ch = Math.min(Math.max(state.progress[id].chapter - 1, 0), s.chapters.length - 1);
+  lastFocus = document.activeElement;
+  state.reader = { id, ch };
+  $('#reader').hidden = false; setInert(true); document.body.classList.add('lock');
+  applySize(); renderReader(true);
+  $('#rClose').focus();
+}
+function renderReader(fresh) {
+  const { id, ch } = state.reader, s = byId(id), c = s.chapters[ch], n = s.chapters.length;
+  $('#rTitle').textContent = s.title; $('#rAuthor').textContent = 'by ' + s.author;
+  $('#rChapters').innerHTML = s.chapters.map((x, i) => `<option value="${i}" ${i === ch ? 'selected' : ''}>${i + 1}. ${esc(x.title)}</option>`).join('');
+  $('#rChapters').hidden = n < 2;
+  const paras = c.text.split(/\n{2,}/).map(p => `<p>${esc(p.trim()).replace(/\n/g, '<br>')}</p>`).join('');
+  $('#rPage').innerHTML = `<p class="r-kicker">Chapter ${ch + 1} of ${n}</p><h2>${esc(c.title)}</h2>${ch === 0 && s.summary ? `<p class="r-sum">${esc(s.summary)}</p>` : ''}${paras}
+    <div class="r-nav"><button class="btn ghost" data-act="prev-ch" ${ch === 0 ? 'disabled' : ''}>Previous chapter</button><button class="btn primary" data-act="next-ch">${ch < n - 1 ? 'Next chapter' : 'Finish reading'}</button></div>`;
+  updateReaderShelf();
+  $('#rScroll').scrollTop = 0;
+  if (!fresh) recordProgress(0); else $('#rBar').style.width = (state.progress[id] && p_ok(state.progress[id]) ? state.progress[id].pct : 0) + '%';
+}
+function updateReaderShelf() {
+  if (!state.reader) return;
+  const id = state.reader.id, saved = state.shelf.has(id), b = $('#rShelf');
+  b.dataset.shelf = id; b.setAttribute('aria-pressed', String(saved));
+  b.innerHTML = `${ic(saved ? 'check' : 'bookmark')}${saved ? 'On Bookshelf' : 'Add to Bookshelf'}`;
+}
+function closeReader() {
+  if (!state.reader) return;
+  clearTimeout(saveTimer); store.set('sw_progress', state.progress);
+  state.reader = null; $('#reader').hidden = true;
+  if (!modalOpen()) { setInert(false); document.body.classList.remove('lock'); }
+  renderContinue();
+  if (lastFocus && lastFocus.isConnected) lastFocus.focus();
+}
+function gotoChapter(i) {
+  const s = byId(state.reader.id); if (i < 0 || i >= s.chapters.length) return;
+  state.reader.ch = i; renderReader(false);
+}
+function toggleShelf(id) {
+  if (state.shelf.has(id)) { state.shelf.delete(id); toast('Removed from your bookshelf.'); } else { state.shelf.add(id); toast('Added to your bookshelf.'); }
+  store.set('sw_shelf', [...state.shelf]);
+  renderHero(); renderPopular(); updateReaderShelf();
+}
+
+/* =====================================================================
+   Navigation & filters
+   ===================================================================== */
+function scrollToEl(sel) { const el = $(sel); if (el) el.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' }); }
+function setFilter(f, nav) {
+  state.filter = f; if (nav) state.nav = nav;
+  if (f.type !== 'search') $('#q').value = '';
+  renderGenres(); renderPopular(); renderNav();
+}
+function go(where) {
+  if (where === 'home') { setFilter({ type: 'all' }, 'home'); window.scrollTo({ top: 0, behavior: reduceMotion() ? 'auto' : 'smooth' }); }
+  else if (where === 'genres') { state.nav = 'genres'; renderNav(); scrollToEl('#genres'); }
+  else if (where === 'authors') openAuthors();
+  else if (where === 'shelf') { setFilter({ type: 'shelf' }, 'shelf'); scrollToEl('#popular'); }
+  else if (where === 'community') toast('Community is coming soon.');
+}
+
+/* =====================================================================
+   Events
+   ===================================================================== */
+const SEL = '[data-open],[data-resume],[data-shelf],[data-genre],[data-del],[data-nav],[data-act],[data-hero],[data-size],[data-author]';
+document.addEventListener('click', e => {
+  const pop = $('#bellPop');
+  if (!pop.hidden && !e.target.closest('#bellPop,#bellBtn')) { pop.hidden = true; $('#bellBtn').setAttribute('aria-expanded', 'false'); }
+  const el = e.target.closest(SEL); if (!el) return;
+  const d = el.dataset;
+  if (d.act === 'overlay') { if (e.target === el) closeModal(); return; }
+  if (d.del) {
+    if (el.classList.contains('armed')) deleteStory(d.del);
+    else { el.classList.add('armed'); el.innerHTML = 'Remove?'; setTimeout(() => { if (el.isConnected) { el.classList.remove('armed'); el.innerHTML = ic('x'); } }, 3000); }
+    return;
+  }
+  if (d.resume) return openReader(d.resume, { resume: true });
+  if (d.open) return openReader(d.open);
+  if (d.shelf) return toggleShelf(d.shelf);
+  if (d.genre) { const same = state.filter.type === 'genre' && state.filter.value.toLowerCase() === d.genre.toLowerCase(); return same ? setFilter({ type: 'all' }, 'home') : setFilter({ type: 'genre', value: d.genre }, 'genres'); }
+  if (d.author) { closeModal(); setFilter({ type: 'author', value: d.author }, 'authors'); scrollToEl('#popular'); return; }
+  if (d.nav) return go(d.nav);
+  if (d.hero) { state.hero = +d.hero; return renderHero(); }
+  if (d.size) { state.size = +d.size; store.set('sw_size', state.size); return applySize(); }
+  switch (d.act) {
+    case 'dev': return openPassword();
+    case 'exit-dev': state.dev = false; state.devPw = ''; renderDev(); renderPopular(); return toast('Developer Mode off.');
+    case 'upload': return openUpload();
+    case 'close-modal': return closeModal();
+    case 'close-reader': return closeReader();
+    case 'prev-ch': return gotoChapter(state.reader.ch - 1);
+    case 'next-ch': {
+      const s = byId(state.reader.id);
+      if (state.reader.ch < s.chapters.length - 1) return gotoChapter(state.reader.ch + 1);
+      state.progress[s.id] = { pct: 100, chapter: s.chapters.length, t: Date.now() }; return closeReader();
+    }
+    case 'clear-filter': return setFilter({ type: 'all' }, 'home');
+    case 'scroll-prev': case 'scroll-next': {
+      const t = $('#track'); if (t) t.scrollBy({ left: (d.act === 'scroll-next' ? 1 : -1) * t.clientWidth * .8, behavior: reduceMotion() ? 'auto' : 'smooth' }); return;
+    }
+    case 'bell': { const open = pop.hidden; pop.hidden = !open; el.setAttribute('aria-expanded', String(open)); el.classList.remove('dot'); return; }
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (modalOpen()) return closeModal();
+    if (state.reader) return closeReader();
+    const pop = $('#bellPop'); if (!pop.hidden) { pop.hidden = true; $('#bellBtn').focus(); }
+    return;
+  }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('card')) { e.preventDefault(); openReader(e.target.dataset.open); }
+});
+document.addEventListener('submit', e => {
+  const f = e.target.closest('form[data-form]'); if (!f) return;
+  e.preventDefault();
+  if (f.dataset.form === 'pw') submitPassword(f); else if (f.dataset.form === 'upload') submitUpload(f);
+});
+$('#q').addEventListener('input', e => {
+  const v = e.target.value.trim();
+  state.filter = v ? { type: 'search', value: v } : { type: 'all' };
+  if (v) state.nav = 'home';
+  renderGenres(); renderPopular(); renderNav();
+});
+$('#rChapters').addEventListener('change', e => gotoChapter(+e.target.value));
+$('#rScroll').addEventListener('scroll', () => {
+  const el = $('#rScroll'), max = el.scrollHeight - el.clientHeight;
+  recordProgress(max > 0 ? el.scrollTop / max : 1);
+}, { passive: true });
+
+/* =====================================================================
+   Server sync: stories live on the server, shared by every visitor
+   ===================================================================== */
+let lastLoad = 0;
+async function loadStories() {
+  try {
+    const r = await fetch('/api/stories', { cache: 'no-store' });
+    if (!r.ok) return;
+    const next = cleanUploaded((await r.json()).stories);
+    lastLoad = Date.now();
+    if (next.map(s => s.id).join() === state.uploaded.map(s => s.id).join()) return;
+    state.uploaded = next;
+    renderContinue(); renderGenres(); renderPopular(); renderRail();
+  } catch (e) { /* offline or API not deployed: built-in stories still work */ }
+}
+// One-time move of stories saved by the older browser-only version.
+async function migrateLocal() {
+  let remaining = cleanUploaded(store.get('sw_uploaded', []));
+  if (!remaining.length) return;
+  let done = 0;
+  for (const s of [...remaining].reverse()) {
+    try {
+      const r = await fetch('/api/stories', { method: 'POST', headers: { 'content-type': 'application/json', 'x-dev-password': state.devPw },
+        body: JSON.stringify({ title: s.title, author: s.author, genre: s.genre, cover: s.cover, summary: s.summary, chapters: s.chapters }) });
+      if (!r.ok) break;
+      const [n] = cleanUploaded([(await r.json()).story]); state.uploaded.unshift(n); done++;
+      remaining = remaining.filter(x => x.id !== s.id); store.set('sw_uploaded', remaining);
+    } catch (e) { break; }
+  }
+  if (!remaining.length) { try { localStorage.removeItem('sw_uploaded'); } catch (e) {} }
+  if (done) { renderAll(); toast(`Moved ${done} ${done === 1 ? 'story' : 'stories'} from this browser to the server.`); }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Date.now() - lastLoad > 30000) loadStories(); });
+
+renderAll();
+loadStories();
+})();
+</script>
+</body>
+</html>
